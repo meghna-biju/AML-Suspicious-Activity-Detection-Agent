@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
+from agents.planner import planner
 
 app = FastAPI(title="Sentinel AI - Stub API")
 
@@ -121,93 +122,23 @@ def fake_analyze_response(query: str):
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest):
-    return fake_analyze_response(req.query)
+    return planner.analyze(req.query)
 
 
 @app.get("/customer/{customer_id}")
 def get_customer(customer_id: str):
-    return {
-        "customer_id": customer_id,
-        "risk_score": 0.82,
-        "risk_level": "High",
-        "triggered_rules": ["structuring_threshold"],
-        "explanation": (
-            f"Customer {customer_id} made 6 transactions between $9,200-$9,800 "
-            "within 48 hours, consistent with structuring."
-        ),
-        "recommended_action": "report",
-        "profile": {
-            "account_age_days": 412,
-            "total_transactions": 87,
-            "avg_transaction_amount": 3200,
-            "flagged_before": True,
-        },
-        "recent_transactions": [
-            {
-                "transaction_id": "T10234",
-                "amount": 9500,
-                "date": "2026-07-20",
-                "type": "wire",
-                "flagged": True,
-            },
-            {
-                "transaction_id": "T10198",
-                "amount": 9300,
-                "date": "2026-07-19",
-                "type": "wire",
-                "flagged": True,
-            },
-        ],
-    }
+    return planner.get_customer(customer_id)
 
 
 @app.post("/chat")
 def chat(req: ChatRequest):
     analysis = fake_analyze_response(req.message)
-    return {
-        "reply_text": (
-            "I found 8 customers with 10+ transactions under $10,000 in the "
-            "dataset. Customer 4521 is the highest risk — flagged for "
-            "structuring with 6 such transactions in the last 30 days."
-        ),
-        "analysis": analysis,
-    }
+    return planner.chat(req.message)
 
 
 @app.get("/report/{entity_id}")
 def report(entity_id: str):
-    return {
-        "entity_id": entity_id,
-        "entity_type": "customer",
-        "risk_level": "High",
-        "risk_score": 0.82,
-        "summary": (
-            f"Customer {entity_id} shows strong indicators of structuring "
-            "behavior over the past 30 days."
-        ),
-        "explanation": (
-            f"Customer {entity_id} made 6 transactions between $9,200-$9,800 "
-            "within a 48-hour window, each just under the $10,000 reporting "
-            "threshold, consistent with structuring."
-        ),
-        "recommended_action": "report",
-        "evidence": [
-            {
-                "type": "rule",
-                "name": "structuring_threshold",
-                "description": "6 transactions under $10,000 within 48h",
-            },
-            {
-                "type": "ml",
-                "name": "isolation_forest_anomaly",
-                "description": (
-                    "Anomaly score 0.79, driven primarily by transaction "
-                    "velocity deviation"
-                ),
-            },
-        ],
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-    }
+    return planner.generate_report(entity_id)
 
 
 @app.get("/")
