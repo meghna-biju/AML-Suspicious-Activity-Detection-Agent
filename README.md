@@ -1,4 +1,4 @@
-# XCAPADE- AML-Suspicious-Activity-Detection-Agent
+# XCAPADE- AML Suspicious Activity Detection Agent
 
 An AI-assisted Anti-Money Laundering (AML) suspicious activity detection backend built with FastAPI. This project provides a stable API contract and mock-first workflow for developing and integrating AML risk analysis features, before plugging in production-grade detection models and data pipelines.
 
