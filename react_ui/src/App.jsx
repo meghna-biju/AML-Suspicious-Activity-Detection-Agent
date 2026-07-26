@@ -32,7 +32,7 @@ function AppHeader() {
       <div className="header-search">
         <input
           type="text"
-          placeholder="Search entity ID (e.g. 4521)…"
+          placeholder="Search entity ID (e.g. 100428660)…"
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={handleSearch}

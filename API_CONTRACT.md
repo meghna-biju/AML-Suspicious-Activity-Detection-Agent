@@ -35,11 +35,11 @@ General-purpose endpoint. Takes a natural language query, runs it through the ag
   "results": [
     {
       "entity_type": "customer",
-      "entity_id": "4521",
+      "entity_id": "100428660",
       "risk_score": 0.82,
       "risk_level": "High",
       "triggered_rules": ["structuring_threshold", "high_velocity"],
-      "explanation": "Customer 4521 made 6 transactions between $9,200-$9,800 within a 48-hour window, each just under the $10,000 reporting threshold. This pattern is consistent with structuring. Transaction velocity is 3.2x above this customer's 90-day average.",
+      "explanation": "Customer 100428660 made 6 transactions between $9,200-$9,800 within a 48-hour window, each just under the $10,000 reporting threshold. This pattern is consistent with structuring. Transaction velocity is 3.2x above this customer's 90-day average.",
       "recommended_action": "report",
       "supporting_data": {
         "transaction_count": 6,
@@ -73,16 +73,16 @@ General-purpose endpoint. Takes a natural language query, runs it through the ag
 
 ## GET /customer/{id}
 
-Single-entity lookup. Used for queries like "Is customer 4521 suspicious?"
+Single-entity lookup. Used for queries like "Is customer 100428660 suspicious?"
 
 **Response**
 ```json
 {
-  "customer_id": "4521",
+  "customer_id": "100428660",
   "risk_score": 0.82,
   "risk_level": "High",
   "triggered_rules": ["structuring_threshold"],
-  "explanation": "Customer 4521 made 6 transactions between $9,200-$9,800 within 48 hours...",
+  "explanation": "Customer 100428660 made 6 transactions between $9,200-$9,800 within 48 hours...",
   "recommended_action": "report",
   "profile": {
     "account_age_days": 412,
@@ -111,7 +111,7 @@ for the chat bubble.
 **Response**
 ```json
 {
-  "reply_text": "I found 8 customers with 10+ transactions under $10,000 in the dataset. Customer 4521 is the highest risk — flagged for structuring with 14 such transactions in the last 30 days.",
+  "reply_text": "I found 8 customers with 10+ transactions under $10,000 in the dataset. Customer 100428660 is the highest risk — flagged for structuring with 14 such transactions in the last 30 days.",
   "analysis": { "...": "same shape as /analyze response above" }
 }
 ```
@@ -125,11 +125,11 @@ Full investigation report for a flagged entity — used by the Investigation/Rep
 **Response**
 ```json
 {
-  "entity_id": "4521",
+  "entity_id": "100428660",
   "entity_type": "customer",
   "risk_level": "High",
   "risk_score": 0.82,
-  "summary": "Customer 4521 shows strong indicators of structuring behavior over the past 30 days.",
+  "summary": "Customer 100428660 shows strong indicators of structuring behavior over the past 30 days.",
   "explanation": "Full detailed explanation text...",
   "recommended_action": "report",
   "evidence": [

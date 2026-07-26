@@ -63,12 +63,12 @@ def fake_analyze_response(query: str):
         "results": [
             {
                 "entity_type": "customer",
-                "entity_id": "4521",
+                "entity_id": "100428660",
                 "risk_score": 0.82,
                 "risk_level": "High",
                 "triggered_rules": ["structuring_threshold", "high_velocity"],
                 "explanation": (
-                    "Customer 4521 made 6 transactions between $9,200-$9,800 "
+                    "Customer 100428660 made 6 transactions between $9,200-$9,800 "
                     "within a 48-hour window, each just under the $10,000 "
                     "reporting threshold. This pattern is consistent with "
                     "structuring. Transaction velocity is 3.2x above this "

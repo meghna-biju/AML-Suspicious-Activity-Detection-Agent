@@ -76,9 +76,9 @@ def combine_scores(rule_results, ml_results):
     )
 
     def risk_level(score):
-        if score >= 70:
+        if score >= 60:
             return "HIGH"
-        elif score >= 40:
+        elif score >= 30:
             return "MEDIUM"
         else:
             return "LOW"

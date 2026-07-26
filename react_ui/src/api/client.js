@@ -16,12 +16,12 @@ const MOCK_ANALYZE = (query) => ({
   results: [
     {
       entity_type: "customer",
-      entity_id: "4521",
+      entity_id: "100428660",
       risk_score: 0.82,
       risk_level: "High",
       triggered_rules: ["structuring_threshold", "high_velocity"],
       explanation:
-        "Customer 4521 made 6 transactions between $9,200–$9,800 within a 48-hour window, each just under the $10,000 reporting threshold. This pattern is consistent with structuring. Transaction velocity is 3.2x above the 90-day average.",
+        "Customer 100428660 made 6 transactions between $9,200–$9,800 within a 48-hour window, each just under the $10,000 reporting threshold. This pattern is consistent with structuring. Transaction velocity is 3.2x above the 90-day average.",
       recommended_action: "report",
       supporting_data: { transaction_count: 6, total_amount: 56400, window: "48h", avg_transaction_amount: 9400 },
     },
@@ -92,11 +92,11 @@ const MOCK_ANALYZE = (query) => ({
 const MOCK_REPORT = (entity_id) => ({
   entity_id,
   entity_type: "customer",
-  risk_level: entity_id === "4521" ? "High" : entity_id === "3317" ? "High" : "Medium",
-  risk_score: entity_id === "4521" ? 0.82 : entity_id === "3317" ? 0.91 : 0.55,
+  risk_level: entity_id === "100428660" ? "High" : entity_id === "3317" ? "High" : "Medium",
+  risk_score: entity_id === "100428660" ? 0.82 : entity_id === "3317" ? 0.91 : 0.55,
   summary: `Customer ${entity_id} shows strong indicators of suspicious behavior over the past 30 days.`,
   explanation: `Detailed review of Customer ${entity_id} indicates multiple threshold avoidance techniques. They frequently deposit amounts just below reporting requirements, consistent with structuring patterns outlined in FinCEN guidance.`,
-  recommended_action: entity_id === "4521" || entity_id === "3317" ? "report" : "review",
+  recommended_action: entity_id === "100428660" || entity_id === "3317" ? "report" : "review",
   evidence: [
     { type: "rule", name: "structuring_threshold", description: "6 transactions under $10,000 within 48h" },
     { type: "ml", name: "isolation_forest_anomaly", description: "Anomaly score 0.79, driven primarily by transaction velocity deviation" },
@@ -141,7 +141,7 @@ export async function chatQuery(message) {
   return fetchWithFallback(
     () => fetch(`${BASE_URL}/chat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) }),
     () => ({
-      reply_text: `I analyzed your request: "${message}". I found 14 flagged entities. Customer 3317 is the highest risk (91%) due to smurfing + layering. Customer 4521 is also high risk (82%) for structuring.`,
+      reply_text: `I analyzed your request: "${message}". I found 14 flagged entities. Customer 3317 is the highest risk (91%) due to smurfing + layering. Customer 100428660 is also high risk (82%) for structuring.`,
       analysis: MOCK_ANALYZE(message),
     })
   );

@@ -16,13 +16,14 @@ const NODE_POSITIONS = {
 
 export default function InvestigationPage() {
   const [params] = useSearchParams();
-  const entityId = params.get('id') || '4521';
+  const entityId = params.get('id') || '100428660';
 
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hoveredNode, setHoveredNode] = useState(null);
   const [note, setNote] = useState('');
   const [status, setStatus] = useState('Open');
+  const [caseClosed, setCaseClosed] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -44,10 +45,10 @@ export default function InvestigationPage() {
 
   // Graph counterparties from evidence / rules for visual
   const cpEntries = [
-    { key: 'cp1', id: 'CP-1029', risk: 0.72, vol: '€42k', pos: NODE_POSITIONS.cp1 },
-    { key: 'cp2', id: 'CP-9931', risk: 0.88, vol: '€120k', pos: NODE_POSITIONS.cp2 },
-    { key: 'cp3', id: 'CP-4421', risk: 0.12, vol: '€8k',  pos: NODE_POSITIONS.cp3 },
-    { key: 'cp4', id: 'CP-7702', risk: 0.55, vol: '€35k', pos: NODE_POSITIONS.cp4 },
+    { key: 'cp1', id: 'CP-1029', risk: 0.72, vol: '₹42k', pos: NODE_POSITIONS.cp1 },
+    { key: 'cp2', id: 'CP-9931', risk: 0.88, vol: '₹120k', pos: NODE_POSITIONS.cp2 },
+    { key: 'cp3', id: 'CP-4421', risk: 0.12, vol: '₹8k',  pos: NODE_POSITIONS.cp3 },
+    { key: 'cp4', id: 'CP-7702', risk: 0.55, vol: '₹35k', pos: NODE_POSITIONS.cp4 },
   ];
 
   return (
@@ -63,27 +64,68 @@ export default function InvestigationPage() {
           <div className="inv-title">#{entityId}</div>
           <div className="inv-meta" style={{ marginTop: 12 }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--foreground)' }}>Score: {score.toFixed(2)}</span>
-            <span style={{ fontSize: 13, color: 'var(--ink-secondary)' }}>{RISK_LABEL(score)} Risk</span>
+            <span style={{ fontSize: 13, color: 'var(--ink-secondary)' }}>{report?.risk_level} Risk</span>
             <span style={{ fontSize: 13, color: 'var(--ink-muted)' }}>Status: {status}</span>
             <span style={{ fontSize: 13, color: 'var(--ink-muted)' }}>Action: <strong style={{ color: 'var(--foreground)' }}>{report?.recommended_action}</strong></span>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 12, position: 'relative' }}>
-          <button
-            className="btn-editorial-primary"
-            style={{ padding: '8px 16px', fontSize: 13, background: 'var(--signal-red)' }}
-            onClick={() => setStatus('Escalated')}
-          >
-            Escalate to FIU
-          </button>
-          <button
-            className="btn-editorial-ghost"
-            style={{ padding: '8px 16px', fontSize: 13 }}
-            onClick={() => setStatus('Dismissed')}
-          >
-            Dismiss
-          </button>
-        </div>
+        <div style={{ display: "flex", gap: 12, position: "relative" }}>
+
+  {!caseClosed && (
+    <>
+      <button
+        className="btn-editorial-primary"
+        style={{
+          padding: "8px 16px",
+          fontSize: 13,
+          background: "var(--signal-red)"
+        }}
+        onClick={() => {
+          setStatus("Escalated");
+          setCaseClosed(true);
+        }}
+      >
+        Escalate to FIU
+      </button>
+
+      <button
+        className="btn-editorial-ghost"
+        style={{
+          padding: "8px 16px",
+          fontSize: 13
+        }}
+        onClick={() => {
+          setStatus("Dismissed");
+          setCaseClosed(true);
+        }}
+      >
+        Dismiss
+      </button>
+    </>
+  )}
+
+  {caseClosed && (
+    <button
+      disabled
+      className="btn-editorial-primary"
+      style={{
+        padding: "8px 16px",
+        fontSize: 13,
+        background:
+          status === "Escalated"
+            ? "var(--signal-red)"
+            : "var(--signal-green)",
+        opacity: 0.9,
+        cursor: "default"
+      }}
+    >
+      {status === "Escalated"
+        ? "✓ Escalated"
+        : "✓ Dismissed"}
+    </button>
+  )}
+
+</div>
       </div>
 
       {/* AI Summary */}
@@ -102,11 +144,6 @@ export default function InvestigationPage() {
         <div>
           <div className="ed-card-title">Entity Profile</div>
           <ul className="ed-list">
-            <li><span>Entity Type</span><span style={{ textTransform: 'capitalize' }}>{report?.entity_type ?? '—'}</span></li>
-            <li><span>Account Age</span><span>{report?.profile?.account_age_days ?? '—'} days</span></li>
-            <li><span>Total Transactions</span><span>{report?.profile?.total_transactions ?? '—'}</span></li>
-            <li><span>Avg. Amount</span><span>${(report?.profile?.avg_transaction_amount ?? 0).toLocaleString()}</span></li>
-            <li><span>Previously Flagged</span><span>{report?.profile?.flagged_before ? 'Yes' : 'No'}</span></li>
             <li><span>Risk Level</span><span className={`ed-badge ${RISK_COLOR(score)}`}>{report?.risk_level}</span></li>
           </ul>
 
@@ -127,7 +164,7 @@ export default function InvestigationPage() {
         {/* Center: SVG Network Graph */}
         <div className="ed-card" style={{ padding: 0, overflow: 'hidden', position: 'relative' }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--hairline)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--ink-muted)' }}>
-            Transaction Network
+          Illustrative Transaction Network
           </div>
           <svg viewBox="0 0 440 400" width="100%" height="100%" style={{ display: 'block' }}>
             {/* Grid */}
@@ -166,7 +203,7 @@ export default function InvestigationPage() {
             ))}
 
             {/* Center Node — primary accent, no halo */}
-            <g style={{ cursor: 'pointer' }} onMouseEnter={() => setHoveredNode({ id: `#${entityId}`, risk: score, vol: `$${(report?.profile?.avg_transaction_amount ?? 0).toLocaleString()}` })} onMouseLeave={() => setHoveredNode(null)}>
+            <g style={{ cursor: 'pointer' }} onMouseEnter={() => setHoveredNode({ id: `#${entityId}`, risk: score, vol: `₹${(report?.profile?.avg_transaction_amount ?? 0).toLocaleString()}` })} onMouseLeave={() => setHoveredNode(null)}>
               <circle cx={NODE_POSITIONS.center.cx} cy={NODE_POSITIONS.center.cy} r={NODE_POSITIONS.center.r} fill="var(--primary)" />
               <text x={NODE_POSITIONS.center.cx} y={NODE_POSITIONS.center.cy + NODE_POSITIONS.center.r + 16} fontSize={11} fill="var(--foreground)" textAnchor="middle" fontWeight={700}>#{entityId}</text>
             </g>
@@ -196,7 +233,7 @@ export default function InvestigationPage() {
                 <div style={{ fontSize: 11, color: 'var(--ink-muted)', marginBottom: 2 }}>{tx.date}</div>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{tx.transaction_id}</div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 4, alignItems: 'center' }}>
-                  <span style={{ fontSize: 13, color: 'var(--ink-secondary)' }}>${tx.amount?.toLocaleString()} · {tx.type}</span>
+                  <span style={{ fontSize: 13, color: 'var(--ink-secondary)' }}>₹{tx.amount?.toLocaleString("en-IN")}· {tx.type}</span>
                   {tx.flagged && <span className="ed-badge red">Flagged</span>}
                 </div>
               </div>
@@ -214,11 +251,63 @@ export default function InvestigationPage() {
           placeholder="Document your findings here…"
           style={{ width: '100%', minHeight: 80, background: 'transparent', border: '1px solid var(--hairline)', padding: 16, borderRadius: 'var(--radius-md)', fontSize: 14, resize: 'vertical', color: 'var(--foreground)', outline: 'none', fontFamily: 'var(--font-sans)' }}
         />
-        {status !== 'Open' && (
-          <div style={{ marginTop: 12, padding: '12px 16px', background: status === 'Escalated' ? 'rgba(208,58,58,0.08)' : 'rgba(58,140,80,0.08)', border: `1px solid ${status === 'Escalated' ? 'var(--signal-red)' : 'var(--signal-green)'}`, borderRadius: 'var(--radius-md)', fontSize: 13, color: status === 'Escalated' ? 'var(--signal-red)' : 'var(--signal-green)', fontWeight: 600 }}>
-            Case {status === 'Escalated' ? 'escalated to FIU' : 'dismissed as false positive'}.
-          </div>
-        )}
+        <div style={{ display: "flex", gap: 12, position: "relative" }}>
+
+{!caseClosed && (
+  <>
+    <button
+      className="btn-editorial-primary"
+      style={{
+        padding: "8px 16px",
+        fontSize: 13,
+        background: "var(--signal-red)"
+      }}
+      onClick={() => {
+        setStatus("Escalated");
+        setCaseClosed(true);
+      }}
+    >
+      Escalate to FIU
+    </button>
+
+    <button
+      className="btn-editorial-ghost"
+      style={{
+        padding: "8px 16px",
+        fontSize: 13
+      }}
+      onClick={() => {
+        setStatus("Dismissed");
+        setCaseClosed(true);
+      }}
+    >
+      Dismiss
+    </button>
+  </>
+)}
+
+{caseClosed && (
+  <button
+    disabled
+    className="btn-editorial-primary"
+    style={{
+      padding: "8px 16px",
+      fontSize: 13,
+      background:
+        status === "Escalated"
+          ? "var(--signal-red)"
+          : "var(--signal-green)",
+      opacity: 0.9,
+      cursor: "default"
+    }}
+  >
+    {status === "Escalated"
+      ? "✓ Escalated"
+      : "✓ Dismissed"}
+  </button>
+)}
+
+</div>
       </div>
     </div>
   );
